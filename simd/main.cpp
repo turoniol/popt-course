@@ -7,12 +7,10 @@
 
 #include <x86intrin.h>
 
-#define PRINT
-
-constexpr auto ARRAY_SIZE = 16;
+constexpr auto ARRAY_SIZE = 100'000;
 using array_t = std::array<float, ARRAY_SIZE>;
 
-template <class F> std::chrono::nanoseconds benchmark(F &&func) {
+template <class F> auto measure_time(F &&func) -> std::chrono::nanoseconds {
   auto start = std::chrono::high_resolution_clock::now();
   func();
   auto end = std::chrono::high_resolution_clock::now();
@@ -54,9 +52,14 @@ void fast_add(array_t &result, const array_t &left, const array_t &right) {
 auto generate_random_array() -> array_t {
   auto result = array_t{};
   for (auto &element : result) {
-    element = static_cast<float>(rand()) / RAND_MAX;
+    element = static_cast<float>(rand()) / static_cast<float>(RAND_MAX);
   }
   return result;
+}
+
+auto float_arrays_are_equal(const array_t &a, const array_t &b) -> bool {
+  return std::ranges::equal(
+      a, b, [](auto a, auto b) { return std::abs(a - b) < 0.0001; });
 }
 
 int main() {
@@ -71,15 +74,14 @@ int main() {
   std::cout << "--------------------------------\n";
   std::cout << "Naive add:\n";
   print_results(naive_result,
-                benchmark([&] { naive_add(naive_result, a, b); }));
+                measure_time([&] { naive_add(naive_result, a, b); }));
 
   std::cout << "--------------------------------\n";
   std::cout << "Fast add:\n";
-  print_results(fast_result, benchmark([&] { fast_add(fast_result, a, b); }));
+  print_results(fast_result,
+                measure_time([&] { fast_add(fast_result, a, b); }));
 
   std::cout << "--------------------------------\n";
 
-  assert(std::ranges::equal(naive_result, fast_result, [](auto a, auto b) {
-    return std::abs(a - b) < 0.0001;
-  }));
+  assert(float_arrays_are_equal(naive_result, fast_result));
 }
