@@ -2,8 +2,8 @@
 
 #include "common.h"
 
+#include <algorithm>
 #include <cstdlib>
-#include <iostream>
 #include <stdlib.h>
 #include <vector>
 
@@ -15,9 +15,7 @@ public:
   using size_type = typename Parent::size_type;
   using difference_type = typename Parent::difference_type;
 
-  template <class U> struct rebind {
-    using other = aligned_allocator<U>;
-  };
+  template <class U> struct rebind { using other = aligned_allocator<U>; };
 
   aligned_allocator() noexcept = default;
   aligned_allocator(const aligned_allocator &) noexcept = default;
@@ -36,13 +34,12 @@ public:
 };
 
 void run_task2() {
-  //   const auto a = generate_random_array();
-  //   const auto b = generate_random_array();
-  auto vector = std::vector<float, aligned_allocator<float>>(33);
+  using alligned_vec = std::vector<float, aligned_allocator<float>>;
 
-  std::ranges::fill(vector, 5);
+  const auto nSize = ARRAY_SIZE + 117;
 
-  for (int i = 0; i < 34; i += 16) {
-    
-  }
+  const auto a = generate_random_range<alligned_vec>(nSize);
+  const auto b = generate_random_range<alligned_vec>(nSize);
+
+  benchmark_arrays_addition(a, b);
 }
