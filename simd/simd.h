@@ -1,6 +1,6 @@
 #pragma once
 
-#include <ranges>
+#include <ranges> // IWYU pragma: keep
 #include <x86intrin.h>
 
 template <std::ranges::random_access_range R>

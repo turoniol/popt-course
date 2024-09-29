@@ -35,3 +35,10 @@ endif()
 target_compile_definitions(app PRIVATE
     # PRINT
 )
+
+add_library(linalg STATIC 
+    linalg.cpp)
+
+target_compile_options(linalg PRIVATE -march=native)
+    
+target_link_libraries(app PRIVATE linalg)

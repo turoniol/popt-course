@@ -41,11 +41,14 @@ void print_results([[maybe_unused]] const R &result,
   }
 }
 
+void print_results(float result, std::chrono::nanoseconds time) noexcept;
+
+bool float_are_equal(float a, float b) noexcept;
+
 namespace detail {
 template <std::ranges::random_access_range R>
 auto float_arrays_are_equal(const R &a, const R &b) -> bool {
-  return std::ranges::equal(
-      a, b, [](auto l, auto r) { return std::abs(l - r) < 0.0001; });
+  return std::ranges::equal(a, b, float_are_equal);
 }
 } // namespace detail
 
@@ -53,6 +56,8 @@ template <std::ranges::random_access_range R>
 void assert_arrays_are_equal(R &&a, R &&b) {
   assert(detail::float_arrays_are_equal(a, b));
 }
+
+void print_splitter();
 
 template <std::ranges::random_access_range R>
 void benchmark_arrays_addition(const R &a, const R &b) {
@@ -66,17 +71,19 @@ void benchmark_arrays_addition(const R &a, const R &b) {
     fast_result.resize(std::ranges::size(a));
   }
 
-  std::cout << "--------------------------------\n";
+  print_splitter();
+
   std::cout << "Naive add:\n";
   print_results(naive_result,
                 measure_time([&] { naive_add(naive_result, a, b); }));
 
-  std::cout << "--------------------------------\n";
+  print_splitter();
+
   std::cout << "Fast add:\n";
   print_results(fast_result,
                 measure_time([&] { fast_add(fast_result, a, b); }));
 
-  std::cout << "--------------------------------\n";
+  print_splitter();
 
   assert_arrays_are_equal(naive_result, fast_result);
 }

@@ -2,6 +2,8 @@
 
 #include <vector>
 
+#include <cstdlib>
+
 template <class T> class aligned_allocator : public std::allocator<T> {
   using Parent = std::allocator<T>;
 
